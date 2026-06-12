@@ -9,8 +9,8 @@
  */
 package mx.unam.musicdb.miner;
 
-import mx.unam.musicdb.dao.CancionDAO;
-import mx.unam.musicdb.model.Cancion;
+import mx.unam.musicdb.dao.RolaDAO;
+import mx.unam.musicdb.model.Rola;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -33,10 +33,9 @@ public class Minero {
 
     private static final Logger LOG = Logger.getLogger(Minero.class.getName());
 
-    private final CancionDAO cancionDAO;
-
-    public Minero(CancionDAO cancionDAO) {
-        this.cancionDAO = cancionDAO;
+    private final RolaDAO rolaDAO;
+    public Minero(RolaDAO rolaDAO) {
+        this.rolaDAO = rolaDAO;
     }
 
     /**
@@ -44,8 +43,8 @@ public class Minero {
      * @param rutaDirectorio Directorio raíz a recorrer
      * @return Lista de canciones procesadas exitosamente
      */
-    public List<Cancion> minar(String rutaDirectorio) {
-        List<Cancion> procesadas = new ArrayList<>();
+    public List<Rola> minar(String rutaDirectorio) {
+        List<Rola> procesadas = new ArrayList<>();
         Path inicio = Paths.get(rutaDirectorio);
 
         if (!Files.exists(inicio) || !Files.isDirectory(inicio)) {
@@ -59,9 +58,9 @@ public class Minero {
                 public FileVisitResult visitFile(Path archivo,
                                                   BasicFileAttributes attrs) {
                     if (archivo.toString().toLowerCase().endsWith(".mp3")) {
-                        Cancion c = procesarArchivo(archivo.toFile());
+                        Rola c = procesarArchivo(archivo.toFile());
                         if (c != null) {
-                            cancionDAO.insertar(c);
+                            rolaDAO.insertar(c);
                             procesadas.add(c);
                             LOG.info("Procesado: " + archivo.getFileName());
                         }
@@ -88,7 +87,7 @@ public class Minero {
      * Lee las etiquetas ID3 de un archivo MP3 y construye un objeto Cancion.
      * @return Cancion con los metadatos, o null si ocurrió un error
      */
-    private Cancion procesarArchivo(File archivo) {
+    private Rola procesarArchivo(File archivo) {
         try {
             AudioFile audioFile = AudioFileIO.read(archivo);
             Tag tag = audioFile.getTag();
@@ -98,16 +97,16 @@ public class Minero {
                 return null;
             }
 
-            String titulo   = leerCampo(tag, FieldKey.TITLE,  archivo.getName());
-            String artista  = leerCampo(tag, FieldKey.ARTIST, "Desconocido");
-            String album    = leerCampo(tag, FieldKey.ALBUM,  "Sin álbum");
-            String genero   = leerCampo(tag, FieldKey.GENRE,  "Sin género");
-            String anioStr  = leerCampo(tag, FieldKey.YEAR,   "0");
-            int anio        = parsearEntero(anioStr, 0);
-            int duracion    = audioFile.getAudioHeader().getTrackLength();
+            String title  = leerCampo(tag, FieldKey.TITLE,  archivo.getName());
+            String genre  = leerCampo(tag, FieldKey.GENRE,  "");
+            String anioStr = leerCampo(tag, FieldKey.YEAR,  "0");
+            String trackStr = leerCampo(tag, FieldKey.TRACK, "0");
+            int year  = parsearEntero(anioStr, 0);
+            int track = parsearEntero(trackStr, 0);
 
-            return new Cancion(titulo, artista, album, anio, genero,
-                               duracion, archivo.getAbsolutePath());
+            // idPerformer e idAlbum se resolverán en la Fase 2
+            // cuando el minero busque o cree el performer y album correspondiente
+            return new Rola(0, 0, archivo.getAbsolutePath(), title, track, year, genre);
 
         } catch (Exception e) {
             LOG.warning("Error procesando archivo " + archivo.getName() + ": " + e.getMessage());

@@ -38,12 +38,12 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxtst6 \
     libxi6 \
-    libgl1-mesa-glx \
+    libgl1 \
     fonts-noto \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar el JAR construido
-COPY --from=builder /app/target/musicdb.jar ./musicdb.jar
+COPY --from=builder /app/target/musicdb-1.0.jar ./musicdb.jar
 
 # Directorio para la base de datos (montado como volumen)
 RUN mkdir -p /app/data
@@ -52,4 +52,5 @@ VOLUME ["/app/data"]
 # Variable de entorno para que SQLite guarde la BD en /app/data
 ENV DB_PATH=/app/data/musicdb.db
 
-CMD ["java", "-jar", "musicdb.jar"]
+COPY --from=builder /app/target/libs ./libs
+CMD ["java", "--module-path", "libs", "--add-modules", "javafx.controls,javafx.fxml,javafx.media", "-jar", "musicdb.jar"]

@@ -1,0 +1,106 @@
+/* main.css — Estilos de MusicDB */
+
+.root {
+    -fx-font-family: "Noto Sans", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+}
+
+/* Cabecera */
+.header {
+    -fx-background-color: #181825;
+    -fx-padding: 16 20 12 20;
+    -fx-spacing: 10;
+}
+
+.titulo-app {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #cba6f7;
+}
+
+/* Barra de búsqueda */
+.barra-busqueda {
+    -fx-alignment: center-left;
+}
+
+.barra-busqueda .text-field {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #6c7086;
+    -fx-background-radius: 6;
+    -fx-padding: 6 12;
+    -fx-pref-height: 32;
+}
+
+/* Botones */
+.btn-primario {
+    -fx-background-color: #cba6f7;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 16;
+    -fx-cursor: hand;
+}
+
+.btn-primario:hover {
+    -fx-background-color: #b48fe8;
+}
+
+.btn-secundario {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-background-radius: 6;
+    -fx-padding: 6 16;
+    -fx-cursor: hand;
+}
+
+.btn-secundario:hover {
+    -fx-background-color: #45475a;
+}
+
+/* Tabla */
+.tabla-canciones {
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: transparent;
+}
+
+.tabla-canciones .column-header-background {
+    -fx-background-color: #181825;
+}
+
+.tabla-canciones .column-header .label {
+    -fx-text-fill: #a6adc8;
+    -fx-font-weight: bold;
+}
+
+.tabla-canciones .table-row-cell {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+    -fx-border-color: transparent;
+}
+
+.tabla-canciones .table-row-cell:odd {
+    -fx-background-color: #24273a;
+}
+
+.tabla-canciones .table-row-cell:selected {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cba6f7;
+}
+
+.tabla-canciones .table-row-cell:hover {
+    -fx-background-color: #2a2a3e;
+}
+
+/* Barra de estado */
+.status-bar {
+    -fx-background-color: #181825;
+    -fx-padding: 6 16;
+}
+
+.status-bar .label {
+    -fx-text-fill: #6c7086;
+    -fx-font-size: 11px;
+}

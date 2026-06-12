@@ -1,0 +1,17 @@
+# docker-compose.yml — MusicDB
+# Uso: docker compose up
+#
+# Requisito previo en el host:
+#   xhost +local:docker
+
+services:
+  musicdb:
+    build: .
+    image: musicdb:latest
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./data:/app/data          # Base de datos SQLite persistente
+      - ./musica:/musica:ro       # Carpeta de MP3 (solo lectura)
+    network_mode: host            # Necesario para X11 en algunos sistemas

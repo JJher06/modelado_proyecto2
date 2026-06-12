@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    main.fxml — Vista principal de MusicDB
+    Esta es la VIEW en el patrón MVC.
+    El controlador asociado es MainController.java
+-->
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="mx.unam.musicdb.controller.MainController"
+            stylesheets="@../css/main.css">
+
+    <!-- Barra superior: título y búsqueda -->
+    <top>
+        <VBox styleClass="header">
+            <Label text="MusicDB" styleClass="titulo-app"/>
+            <HBox styleClass="barra-busqueda" spacing="10">
+                <TextField fx:id="campoBusqueda"
+                           promptText="Buscar por artista..."
+                           HBox.hgrow="ALWAYS"/>
+                <Button text="Buscar"    onAction="#buscar"     styleClass="btn-primario"/>
+                <Button text="Ver todas" onAction="#cargarTodas" styleClass="btn-secundario"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Tabla central de canciones -->
+    <center>
+        <TableView fx:id="tablaCanciones" styleClass="tabla-canciones">
+            <columns>
+                <TableColumn fx:id="colId"      text="ID"      prefWidth="50"/>
+                <TableColumn fx:id="colTitulo"  text="Título"  prefWidth="200"/>
+                <TableColumn fx:id="colArtista" text="Artista" prefWidth="160"/>
+                <TableColumn fx:id="colAlbum"   text="Álbum"   prefWidth="160"/>
+                <TableColumn fx:id="colAnio"    text="Año"     prefWidth="70"/>
+                <TableColumn fx:id="colGenero"  text="Género"  prefWidth="100"/>
+            </columns>
+            <placeholder>
+                <Label text="No hay canciones. Ejecuta el minero para importar archivos MP3."/>
+            </placeholder>
+        </TableView>
+    </center>
+
+    <!-- Barra inferior: estado -->
+    <bottom>
+        <HBox styleClass="status-bar">
+            <Label fx:id="etiquetaEstado" text="Listo"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -10,10 +10,10 @@ package mx.unam.musicdb.model;
  */
 public class Album {
 
-    private int    idAlbum;
+    private int idAlbum;
     private String path;
     private String name;
-    private int    year;
+    private int year;
 
     public Album() {}
 
@@ -23,14 +23,17 @@ public class Album {
         this.year = year;
     }
 
-    public int    getIdAlbum()             { return idAlbum; }
-    public void   setIdAlbum(int idAlbum)  { this.idAlbum = idAlbum; }
-    public String getPath()                { return path; }
-    public void   setPath(String path)     { this.path = path; }
-    public String getName()                { return name; }
-    public void   setName(String name)     { this.name = name; }
-    public int    getYear()                { return year; }
-    public void   setYear(int year)        { this.year = year; }
+    public int getIdAlbum() { return idAlbum; }
+    public void setIdAlbum(int idAlbum)  { this.idAlbum = idAlbum; }
+
+    public String getPath() { return path; }
+    public void setPath(String path) { this.path = path; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
 
     @Override
     public String toString() {

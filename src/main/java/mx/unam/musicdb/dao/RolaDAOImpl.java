@@ -17,15 +17,26 @@ import java.util.Optional;
  */
 public class RolaDAOImpl implements RolaDAO {
 
+    private static final String COLS =
+        "r.id_rola, r.id_performer, r.id_album, r.path, r.title, r.track, r.year, r.genre, " +
+        "p.name AS performer_name, a.name AS album_name";
+
+    private static final String FROM =
+        " FROM rolas r JOIN performers p ON r.id_performer = p.id_performer " +
+        "JOIN albums a ON r.id_album = a.id_album";
+
     private static final String SQL_INSERTAR =
         "INSERT INTO rolas (id_performer, id_album, path, title, track, year, genre) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_BUSCAR_POR_ID =
-        "SELECT * FROM rolas WHERE id_rola = ?";
+        "SELECT " + COLS + FROM + " WHERE r.id_rola = ?";
+
+    private static final String SQL_BUSCAR_POR_PATH =
+        "SELECT " + COLS + FROM + " WHERE r.path = ?";
 
     private static final String SQL_BUSCAR_TODOS =
-        "SELECT * FROM rolas ORDER BY id_performer, id_album, track";
+        "SELECT " + COLS + FROM + " ORDER BY p.name, a.name, r.track";
 
     private static final String SQL_ACTUALIZAR =
         "UPDATE rolas SET id_performer=?, id_album=?, path=?, title=?, " +
@@ -35,19 +46,22 @@ public class RolaDAOImpl implements RolaDAO {
         "DELETE FROM rolas WHERE id_rola = ?";
 
     private static final String SQL_POR_TITULO =
-        "SELECT * FROM rolas WHERE title LIKE ? ORDER BY title";
+        "SELECT " + COLS + FROM + " WHERE r.title LIKE ? ORDER BY r.title";
 
     private static final String SQL_POR_PERFORMER =
-        "SELECT * FROM rolas WHERE id_performer = ? ORDER BY id_album, track";
+        "SELECT " + COLS + FROM + " WHERE r.id_performer = ? ORDER BY a.name, r.track";
 
     private static final String SQL_POR_ALBUM =
-        "SELECT * FROM rolas WHERE id_album = ? ORDER BY track";
+        "SELECT " + COLS + FROM + " WHERE r.id_album = ? ORDER BY r.track";
 
     private static final String SQL_POR_GENERO =
-        "SELECT * FROM rolas WHERE genre = ? ORDER BY title";
+        "SELECT " + COLS + FROM + " WHERE r.genre = ? ORDER BY r.title";
 
     private static final String SQL_POR_ANIO =
-        "SELECT * FROM rolas WHERE year = ? ORDER BY title";
+        "SELECT " + COLS + FROM + " WHERE r.year = ? ORDER BY r.title";
+
+    private static final String SQL_BUSCAR_PERSONALIZADO =
+        "SELECT " + COLS + FROM + " WHERE ";
 
     // --- CRUD ---
 
@@ -80,6 +94,18 @@ public class RolaDAOImpl implements RolaDAO {
             throw new RuntimeException("Error al buscar rola con id=" + id, e);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Rola buscarPorPath(String path) {
+        try (PreparedStatement ps = getConn().prepareStatement(SQL_BUSCAR_POR_PATH)) {
+            ps.setString(1, path);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapear(rs);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar rola por path: " + path, e);
+        }
+        return null;
     }
 
     @Override
@@ -172,56 +198,62 @@ public class RolaDAOImpl implements RolaDAO {
     public List<Rola> buscarPorCampos(String titulo, String genero,
                                        Integer anio, Integer idPerformer,
                                        Integer idAlbum) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM rolas WHERE 1=1");
+        StringBuilder sql = new StringBuilder("1=1");
         List<Object> params = new ArrayList<>();
 
         if (titulo != null && !titulo.isBlank()) {
-            sql.append(" AND title LIKE ?");
+            sql.append(" AND r.title LIKE ?");
             params.add("%" + titulo + "%");
         }
         if (genero != null && !genero.isBlank()) {
-            sql.append(" AND genre = ?");
+            sql.append(" AND r.genre = ?");
             params.add(genero);
         }
         if (anio != null) {
-            sql.append(" AND year = ?");
+            sql.append(" AND r.year = ?");
             params.add(anio);
         }
         if (idPerformer != null) {
-            sql.append(" AND id_performer = ?");
+            sql.append(" AND r.id_performer = ?");
             params.add(idPerformer);
         }
         if (idAlbum != null) {
-            sql.append(" AND id_album = ?");
+            sql.append(" AND r.id_album = ?");
             params.add(idAlbum);
         }
-        sql.append(" ORDER BY title");
-
-        List<Rola> lista = new ArrayList<>();
-        try (PreparedStatement ps = getConn().prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++)
-                ps.setObject(i + 1, params.get(i));
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) lista.add(mapear(rs));
-        } catch (SQLException e) {
-            throw new RuntimeException("Error en búsqueda dinámica", e);
-        }
-        return lista;
+        return buscarPersonalizado(sql.toString(), params);
     }
 
     // --- Helpers privados ---
 
     private Rola mapear(ResultSet rs) throws SQLException {
         Rola r = new Rola();
-        r.setIdRola      (rs.getInt   ("id_rola"));
-        r.setIdPerformer (rs.getInt   ("id_performer"));
-        r.setIdAlbum     (rs.getInt   ("id_album"));
-        r.setPath        (rs.getString("path"));
-        r.setTitle       (rs.getString("title"));
-        r.setTrack       (rs.getInt   ("track"));
-        r.setYear        (rs.getInt   ("year"));
-        r.setGenre       (rs.getString("genre"));
+        r.setIdRola(rs.getInt("id_rola"));
+        r.setIdPerformer(rs.getInt("id_performer"));
+        r.setIdAlbum(rs.getInt("id_album"));
+        r.setPath(rs.getString("path"));
+        r.setTitle(rs.getString("title"));
+        r.setTrack(rs.getInt("track"));
+        r.setYear(rs.getInt("year"));
+        r.setGenre(rs.getString("genre"));
+        r.setPerformerName(rs.getString("performer_name"));
+        r.setAlbumName(rs.getString("album_name"));
         return r;
+    }
+
+    @Override
+    public List<Rola> buscarPersonalizado(String whereClause, List<Object> params) {
+        String sql = SQL_BUSCAR_PERSONALIZADO + whereClause + " ORDER BY r.title";
+        List<Rola> lista = new ArrayList<>();
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++)
+                ps.setObject(i + 1, params.get(i));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) lista.add(mapear(rs));
+        } catch (SQLException e) {
+            throw new RuntimeException("Error en búsqueda personalizada", e);
+        }
+        return lista;
     }
 
     private List<Rola> buscarPorCampoInt(String sql, int valor) {

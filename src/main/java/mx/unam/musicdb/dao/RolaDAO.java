@@ -7,12 +7,15 @@ package mx.unam.musicdb.dao;
 import mx.unam.musicdb.model.Rola;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO específico para la entidad Rola.
  * Extiende el DAO genérico y agrega búsquedas propias del dominio musical.
  */
 public interface RolaDAO extends DAO<Rola, Integer> {
+
+    Rola buscarPorPath(String path);
 
     List<Rola> buscarPorTitulo(String titulo);
 
@@ -31,4 +34,6 @@ public interface RolaDAO extends DAO<Rola, Integer> {
     List<Rola> buscarPorCampos(String titulo, String genero,
                                 Integer anio, Integer idPerformer,
                                 Integer idAlbum);
+
+    List<Rola> buscarPersonalizado(String whereClause, List<Object> parametros);
 }

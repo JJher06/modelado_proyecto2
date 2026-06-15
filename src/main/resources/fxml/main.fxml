@@ -12,10 +12,11 @@
             <Label text="MusicDB" styleClass="titulo-app"/>
             <HBox styleClass="barra-busqueda" spacing="10">
                 <TextField fx:id="campoBusqueda"
-                           promptText="Buscar por título..."
+                           promptText="titulo:love,genero:rock | performer:queen | anio>=1990"
                            HBox.hgrow="ALWAYS"/>
-                <Button text="Buscar"    onAction="#buscar"      styleClass="btn-primario"/>
-                <Button text="Ver todas" onAction="#cargarTodas" styleClass="btn-secundario"/>
+                <Button text="Buscar"      onAction="#buscar"      styleClass="btn-primario"/>
+                <Button text="Ver todas"   onAction="#cargarTodas" styleClass="btn-secundario"/>
+                <Button text="Importar MP3" onAction="#importarMP3" styleClass="btn-importar"/>
             </HBox>
         </VBox>
     </top>

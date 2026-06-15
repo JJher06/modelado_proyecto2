@@ -5,12 +5,12 @@
 package mx.unam.musicdb.model;
 
 /**
- * Representa una persona (artista individual).
+ * Representa un artista individual.
  * Se relaciona con Performer mediante id_performer.
  */
 public class Person {
 
-    private int    idPerson;
+    private int idPerson;
     private String stageName;
     private String realName;
     private String birthDate;
@@ -21,21 +21,25 @@ public class Person {
     public Person(String stageName, String realName,
                   String birthDate, String deathDate) {
         this.stageName = stageName;
-        this.realName  = realName;
+        this.realName = realName;
         this.birthDate = birthDate;
         this.deathDate = deathDate;
     }
 
-    public int    getIdPerson()                  { return idPerson; }
-    public void   setIdPerson(int idPerson)      { this.idPerson = idPerson; }
-    public String getStageName()                 { return stageName; }
-    public void   setStageName(String stageName) { this.stageName = stageName; }
-    public String getRealName()                  { return realName; }
-    public void   setRealName(String realName)   { this.realName = realName; }
-    public String getBirthDate()                 { return birthDate; }
-    public void   setBirthDate(String birthDate) { this.birthDate = birthDate; }
-    public String getDeathDate()                 { return deathDate; }
-    public void   setDeathDate(String deathDate) { this.deathDate = deathDate; }
+    public int getIdPerson() { return idPerson; }
+    public void setIdPerson(int idPerson) { this.idPerson = idPerson; }
+
+    public String getStageName() { return stageName; }
+    public void setStageName(String stageName) { this.stageName = stageName; }
+
+    public String getRealName() { return realName; }
+    public void setRealName(String realName) { this.realName = realName; }
+
+    public String getBirthDate() { return birthDate; }
+    public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
+
+    public String getDeathDate() { return deathDate; }
+    public void setDeathDate(String deathDate) { this.deathDate = deathDate; }
 
     @Override
     public String toString() {

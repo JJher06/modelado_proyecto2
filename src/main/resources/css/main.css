@@ -60,6 +60,19 @@
     -fx-background-color: #45475a;
 }
 
+.btn-importar {
+    -fx-background-color: #a6e3a1;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 16;
+    -fx-cursor: hand;
+}
+
+.btn-importar:hover {
+    -fx-background-color: #81c784;
+}
+
 /* Tabla */
 .tabla-canciones {
     -fx-background-color: #1e1e2e;

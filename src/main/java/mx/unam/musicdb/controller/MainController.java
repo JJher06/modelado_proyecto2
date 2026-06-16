@@ -1,11 +1,14 @@
 package mx.unam.musicdb.controller;
 
 import javafx.application.Platform;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 import mx.unam.musicdb.compilador.CompiladorBusqueda;
 import mx.unam.musicdb.dao.RolaDAO;
@@ -66,32 +69,55 @@ public class MainController {
 
     @FXML
     public void importarMP3() {
-        DirectoryChooser dc = new DirectoryChooser();
-        dc.setTitle("Seleccionar carpeta con archivos MP3");
-        File dir = dc.showDialog(tablaRolas.getScene().getWindow());
-        if (dir == null) return;
+        TextField pathField = new TextField();
+        pathField.setPromptText("/ruta/a/carpeta/con/mp3");
 
-        String ruta = dir.getAbsolutePath();
-        actualizarEstado("Importando desde: " + ruta + " ...");
+        Button examinarBtn = new Button("Examinar...");
+        examinarBtn.setOnAction(e -> {
+            DirectoryChooser dc = new DirectoryChooser();
+            dc.setTitle("Seleccionar carpeta con archivos MP3");
+            File dir = dc.showDialog(tablaRolas.getScene().getWindow());
+            if (dir != null) pathField.setText(dir.getAbsolutePath());
+        });
 
-        new Thread(() -> {
-            try {
-                Minero minero = new Minero(
-                    new mx.unam.musicdb.dao.PerformerDAOImpl(),
-                    new mx.unam.musicdb.dao.AlbumDAOImpl(),
-                    rolaDAO
-                );
-                List<Rola> insertadas = minero.minar(ruta);
-                Platform.runLater(() -> {
-                    cargarTodas();
-                    actualizarEstado("Importacion completada: " + insertadas.size()
-                            + " rolas insertadas desde " + ruta);
-                });
-            } catch (Exception e) {
-                Platform.runLater(() ->
-                    actualizarEstado("Error en importacion: " + e.getMessage()));
-            }
-        }).start();
+        HBox inputRow = new HBox(8, pathField, examinarBtn);
+        inputRow.setStyle("-fx-padding: 8 0;");
+        HBox.setHgrow(pathField, Priority.ALWAYS);
+
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Importar MP3");
+        dialog.setHeaderText("Selecciona la carpeta con archivos MP3:");
+        dialog.getDialogPane().setContent(inputRow);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.setResultConverter(btn -> btn == ButtonType.OK ? pathField.getText() : null);
+        dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+        pathField.textProperty().addListener((obs, o, n) ->
+            dialog.getDialogPane().lookupButton(ButtonType.OK)
+                .setDisable(n == null || n.isBlank()));
+
+        dialog.initOwner(tablaRolas.getScene().getWindow());
+
+        dialog.showAndWait().ifPresent(ruta -> {
+            actualizarEstado("Importando desde: " + ruta + " ...");
+            new Thread(() -> {
+                try {
+                    Minero minero = new Minero(
+                        new mx.unam.musicdb.dao.PerformerDAOImpl(),
+                        new mx.unam.musicdb.dao.AlbumDAOImpl(),
+                        rolaDAO
+                    );
+                    List<Rola> insertadas = minero.minar(ruta);
+                    Platform.runLater(() -> {
+                        cargarTodas();
+                        actualizarEstado("Importacion completada: " + insertadas.size()
+                                + " rolas insertadas desde " + ruta);
+                    });
+                } catch (Exception ex) {
+                    Platform.runLater(() ->
+                        actualizarEstado("Error en importacion: " + ex.getMessage()));
+                }
+            }).start();
+        });
     }
 
     private void configurarColumnas() {

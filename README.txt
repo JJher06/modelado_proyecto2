@@ -26,8 +26,6 @@ Ejecucion local (sin Docker)
      mvn compile
      mvn javafx:run
 
-Nota: La base de datos se guarda en ./musicdb.db.
-
 
 Pruebas unitarias
 ---------------
